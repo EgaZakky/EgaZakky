@@ -1,0 +1,32 @@
+name: GitHub contribution graph snake animation
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Draw contribution graph snake
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Draw snake
+        uses: Platane/snk@v3
+        id: snake
+        with:
+          github_user_name: EgaZakky
+          outputs: |
+            output/github-contribution-grid-snake.svg
+
+      - name: Commit results
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "chore: update snake animation" || true
+          git push || true
