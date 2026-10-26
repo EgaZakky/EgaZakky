@@ -7,6 +7,9 @@ on:
     - cron: '0 */6 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Draw contribution graph snake
@@ -14,19 +17,23 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Draw snake
         uses: Platane/snk@v3
         id: snake
         with:
           github_user_name: EgaZakky
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           outputs: |
             output/github-contribution-grid-snake.svg
 
-      - name: Commit results
+      - name: Commit and push snake to output branch
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add -A
-          git commit -m "chore: update snake animation" || true
-          git push || true
+          git checkout -b output || git checkout output
+          git add output/github-contribution-grid-snake.svg
+          git commit -m "chore: update snake animation [skip ci]" || true
+          git push -u origin output || true
